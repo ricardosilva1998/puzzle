@@ -11,7 +11,7 @@ A sliding-tile puzzle game. Pick one of 8 images, choose a difficulty (3×3 to 6
 - **TypeScript** strict mode
 - **Vite** for bundling and dev server
 - **Bun** as the package manager and test runner
-- **Caddy** for static serving on Railway
+- **Railpack** for static serving on Railway
 
 ## Run locally
 
@@ -37,8 +37,8 @@ bun run preview      # serve the built bundle locally
 ## Deploy
 
 Pushes to `main` are auto-deployed by Railway. The build runs
-`bun install && bun run build`, and Caddy serves `dist/` on the
-port Railway provides via `$PORT`.
+`bun install && bun run build`, and Railpack serves `dist/` on the
+port Railway provides via `$PORT` (`RAILPACK_STATIC_FILE_ROOT=dist`).
 
 To deploy from the CLI:
 
