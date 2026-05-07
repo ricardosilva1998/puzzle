@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>MultiPuzzle</title>
+    <link rel="stylesheet" href="/src/styles.css">
+</head>
+<body>
+    <main id="game">
+        <h1 id="title">MultiPuzzle</h1>
+        <div id="stage" class="board"></div>
+        <div id="final" class="board" hidden></div>
+        <div id="output">
+            <div id="moves" class="left">
+                <strong>Moves:</strong> <span id="counter">0</span>
+            </div>
+            <div class="right">
+                <button id="showResult" class="icon view" type="button" aria-label="Show solution"></button>
+                <button id="muteOpt" class="icon sound" type="button" aria-label="Toggle sound"></button>
+            </div>
+        </div>
+        <div id="thumbSet"></div>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
