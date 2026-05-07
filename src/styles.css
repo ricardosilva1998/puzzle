@@ -1,0 +1,223 @@
+/* MultiPuzzle — modernized from the 2020 version
+   Original group: David Morais, Leonardo Carvalho, Ricardo Silva */
+
+:root {
+  --board-max: 366px;
+  --board-size: min(90vw, var(--board-max));
+  --primary: #1d4952;
+  --primary-light: #1e7179;
+  --accent: #008cba;
+  --bg: rgba(0, 0, 0, 0.9);
+  --text-light: #fff;
+}
+
+* { box-sizing: border-box; padding: 0; margin: 0; }
+
+@font-face {
+  font-family: PiratesWriters;
+  src: url('/fonts/PiratesWriters.ttf') format('truetype');
+  font-display: swap;
+}
+
+body {
+  background-image: url('/images/background.jpg');
+  background-size: cover;
+  background-attachment: fixed;
+  min-height: 100vh;
+  font-family: tahoma, sans-serif;
+  color: var(--text-light);
+}
+
+#game {
+  width: var(--board-size);
+  margin: 24px auto;
+  position: relative;
+}
+
+h1#title {
+  text-align: center;
+  font-family: PiratesWriters, serif;
+  font-size: clamp(36px, 8vw, 50px);
+  text-shadow: 1px 1px 1px var(--primary);
+  margin-bottom: 8px;
+}
+
+.board {
+  position: relative;
+  width: var(--board-size);
+  aspect-ratio: 1 / 1;
+  margin: 4px 0;
+  background-color: white;
+  border: 10px solid var(--primary);
+  box-shadow: inset 2px 2px 2px 0 #aaa, 4px 4px 4px var(--primary-light);
+  border-radius: 2%;
+  overflow: hidden;
+}
+.board[hidden] { display: none; }
+
+.cell {
+  position: absolute;
+  border: 1px solid white;
+  border-radius: 5%;
+  box-shadow: 1px 1px 1px #888;
+  cursor: pointer;
+  background-repeat: no-repeat;
+  user-select: none;
+}
+.cell:hover { opacity: 0.9; }
+
+.rotate {
+  position: absolute;
+  border: 1px solid white;
+  border-radius: 5%;
+  box-shadow: 1px 1px 1px #888;
+  background-repeat: no-repeat;
+  animation: rotate ease-out 0.5s;
+}
+@keyframes rotate {
+  from { transform: rotate(180deg); border-radius: 100%; }
+  to   { transform: rotate(360deg); border-radius: 5%; }
+}
+
+#output {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  text-shadow: 1px 1px 1px var(--primary);
+}
+#output .right { display: flex; gap: 6px; }
+
+.icon {
+  width: 28px;
+  height: 28px;
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 0;
+}
+.view {
+  background-image: url('/images/ui/view.png');
+  box-shadow: inset 0 0 0 1px white;
+}
+.viewOff { background-position-x: -28px; }
+.sound { background-image: url('/images/ui/sound-icon-250.png'); }
+.soundOff { background-position-x: -28px; }
+
+#thumbSet {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+  position: relative;
+}
+.imgButton, .swing {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  padding: 1px;
+  background-color: white;
+  cursor: pointer;
+  object-fit: cover;
+}
+.swing { animation: swing infinite ease-in-out 12s; transform-origin: center; }
+@keyframes swing {
+  12.5% { transform: rotate(30deg); }
+  37.5% { transform: rotate(-30deg); }
+  50%   { transform: none; }
+  62.5% { transform: rotate(-30deg); }
+  87.5% { transform: rotate(30deg); }
+  100%  { transform: none; }
+}
+
+#overlay {
+  position: fixed;
+  inset: 0;
+  background-color: var(--bg);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  z-index: 10;
+}
+#overlay.visible { display: flex; }
+#overlay .overlay-text {
+  max-width: 600px;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: left;
+}
+#overlay .overlay-text p:first-child {
+  font-weight: bold;
+  text-decoration: underline;
+  font-size: 1.25rem;
+  margin-bottom: 8px;
+}
+#overlay .overlay-text p {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.startGame {
+  background-color: var(--accent);
+  border: 3px solid blue;
+  border-radius: 10px;
+  padding: 12px 24px;
+  font-size: 1.25rem;
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif;
+  color: white;
+  cursor: pointer;
+}
+.startGame:hover { background-color: blue; }
+
+#difficulty {
+  position: relative;
+}
+.dropdown-toggle {
+  background-color: #4caf50;
+  border: 3px solid green;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: Arial, Helvetica, sans-serif;
+  color: white;
+}
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 11;
+}
+#difficulty.open .dropdown-menu { display: flex; }
+
+.btnDif {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 0;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: Arial, Helvetica, sans-serif;
+  color: white;
+  font-size: 0.9rem;
+}
+.d3 { background-color: #4caf50; border: 3px solid green; }
+.d4 { background-color: #ffe066; border: 3px solid #d4a017; color: #333; }
+.d5 { background-color: #ff6a33; border: 3px solid orangered; }
+.d6 { background-color: #f44336; border: 3px solid darkred; }
+
+@media (max-width: 480px) {
+  :root { --board-max: 100vw; }
+  #game { margin-top: 12px; }
+  h1#title { font-size: 36px; }
+  .imgButton, .swing { width: 44px; height: 44px; }
+}
