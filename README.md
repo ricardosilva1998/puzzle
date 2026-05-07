@@ -2,9 +2,18 @@
 
 A sliding-tile puzzle game. Pick one of 8 images, choose a difficulty (3×3 to 6×6), shuffle, and click tiles to slide them toward the empty cell until the picture is restored. Modernized in 2026 from a 2020 vanilla HTML/CSS/JS prototype.
 
-![Screenshot](docs/img/screenshot.png)
+![Desktop](docs/img/screenshot.png)
 
 **[Play it →](https://puzzle-production-5cea.up.railway.app)**
+
+<details>
+<summary>Other viewports</summary>
+
+| Mobile (375) | Tablet (768) | Wide desktop (1440) |
+|---|---|---|
+| ![](docs/img/screenshot-mobile.png) | ![](docs/img/screenshot-tablet.png) | ![](docs/img/screenshot-desktop-wide.png) |
+
+</details>
 
 ## Stack
 
