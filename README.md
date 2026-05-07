@@ -4,7 +4,7 @@ A sliding-tile puzzle game. Pick one of 8 images, choose a difficulty (3×3 to 6
 
 ![Screenshot](docs/img/screenshot.png)
 
-**[Play it →](https://puzzle.up.railway.app)** *(URL filled in after first deploy)*
+**[Play it →](https://puzzle-production-5cea.up.railway.app)**
 
 ## Stack
 
