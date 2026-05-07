@@ -1,5 +1,5 @@
 import { buildMap, isFinished, markSolvedComplete, moveTile, shuffleBoard } from './game';
-import { renderBoard, type RenderRefs } from './render';
+import { createRenderContext, renderBoard, type RenderContext, type RenderRefs } from './render';
 import { AudioManager } from './audio';
 import { DIFFICULTIES, PUZZLE_IMAGES, type Difficulty, type GameState } from './types';
 
@@ -38,8 +38,22 @@ const DIFFICULTY_LABELS: Record<Difficulty, string> = {
   6: 'Very Hard',
 };
 
+function triggerPulse(el: HTMLElement, className: string): void {
+  el.classList.remove(className);
+  // Force a reflow so removing then re-adding the class restarts the animation.
+  void el.offsetWidth;
+  el.classList.add(className);
+}
+
+function clearStageCache(ctx: RenderContext, stage: HTMLElement): void {
+  for (const cell of ctx.stageCells.values()) cell.remove();
+  ctx.stageCells.clear();
+  stage.replaceChildren();
+}
+
 export function mountUI(refs: DOMRefs): void {
   const audio = new AudioManager();
+  const renderCtx = createRenderContext();
   const state: GameState = {
     difficulty: 3,
     rows: 3,
@@ -132,6 +146,13 @@ export function mountUI(refs: DOMRefs): void {
     }
   };
 
+  const renderCurrent = (): void => {
+    renderBoard(state, refs, renderCtx, {
+      onTileClick: handleTileClick,
+      showingSolution: state.showingSolution,
+    });
+  };
+
   const startGame = (imageName: string | null): void => {
     audio.init();
     const built = buildMap(state.difficulty);
@@ -145,12 +166,15 @@ export function mountUI(refs: DOMRefs): void {
     refs.stage.hidden = false;
     refs.final.hidden = true;
 
+    // Drop cached cells so a new game (different difficulty or restart) gets fresh DOM.
+    clearStageCache(renderCtx, refs.stage);
+
     if (imageName) {
       shuffleBoard(state);
       audio.play('shuffle');
     }
     renderImagePicker();
-    renderBoard(state, refs, { onTileClick: handleTileClick, showingSolution: false });
+    renderCurrent();
     overlay.classList.remove('visible');
   };
 
@@ -158,17 +182,20 @@ export function mountUI(refs: DOMRefs): void {
     const result = moveTile(state, tile);
     if (result.moved) {
       audio.play('move');
+      triggerPulse(refs.counter, 'pulse');
     } else {
       audio.play('error');
     }
+    renderCurrent();
     if (isFinished(state)) {
       markSolvedComplete(state);
       audio.play('success');
+      triggerPulse(refs.stage, 'win-pulse');
       renderOverlayText(RESTART_RULES);
       startBtn.textContent = 'Restart game';
-      overlay.classList.add('visible');
+      // Delay so the win pulse plays before the overlay covers it.
+      window.setTimeout(() => overlay.classList.add('visible'), 320);
     }
-    renderBoard(state, refs, { onTileClick: handleTileClick, showingSolution: false });
   };
 
   startBtn.addEventListener('click', () => {
@@ -183,7 +210,7 @@ export function mountUI(refs: DOMRefs): void {
     refs.final.hidden = false;
     refs.showResult.classList.add('viewOff');
     audio.play('solution');
-    renderBoard(state, refs, { onTileClick: handleTileClick, showingSolution: true });
+    renderCurrent();
   });
 
   const hideSolution = (): void => {
@@ -192,7 +219,7 @@ export function mountUI(refs: DOMRefs): void {
     refs.stage.hidden = false;
     refs.final.hidden = true;
     refs.showResult.classList.remove('viewOff');
-    renderBoard(state, refs, { onTileClick: handleTileClick, showingSolution: false });
+    renderCurrent();
   };
   refs.showResult.addEventListener('mouseup', hideSolution);
   refs.showResult.addEventListener('mouseleave', hideSolution);
@@ -204,12 +231,7 @@ export function mountUI(refs: DOMRefs): void {
   });
 
   window.addEventListener('resize', () => {
-    if (state.selectedImage) {
-      renderBoard(state, refs, {
-        onTileClick: handleTileClick,
-        showingSolution: state.showingSolution,
-      });
-    }
+    if (state.selectedImage) renderCurrent();
   });
 
   renderImagePicker();
